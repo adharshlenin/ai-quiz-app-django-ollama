@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🪐 Galaxy Quiz - AI Edition</title>
+    <link rel="stylesheet" href="{% static 'quiz/styles.css' %}">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url("{% static 'quiz/galaxy.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: auto;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: auto;
+            margin-top: 60px;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.85);
+            border-radius: 16px;
+            text-align: left;
+            box-shadow: 0 0 20px #0ff;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #0ff;
+        }
+
+        p.subtitle {
+            font-size: 1rem;
+            color: #aaa;
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            background-color: #0ff;
+            color: #000;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0cc;
+        }
+
+        /* Loader */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0.95;
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spaceship-loader {
+            width: 100px;
+            height: 100px;
+            background-image: url("{% static 'quiz/spaceship.png' %}");
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: rotate 2s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+
+        footer {
+            position: fixed;
+            bottom: 12px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loadingScreen">
+    <div class="spaceship-loader"></div>
+    🛸 Generating your Galaxy Quiz... Please wait...
+</div>
+
+<div class="container">
+    <h1>🌌 Galaxy Quiz Generator</h1>
+    <p class="subtitle">Powered by AI - Ollama Edition 🚀</p>
+
+    {% if quiz_data %}
+        <!-- Quiz Display Form -->
+        <form method="POST">
+            {% csrf_token %}
+            {% for q in quiz_data %}
+                <p><strong>Q{{ forloop.counter }}: {{ q.question }}</strong></p>
+                {% for key, value in q.options.items %}
+                    <label>
+                        <input type="radio" name="answer_{{ forloop.parentloop.counter0 }}" value="{{ key }}" required>
+                        {{ key }}) {{ value }}
+                    </label><br>
+                {% endfor %}
+                <br>
+            {% endfor %}
+            <button type="submit" name="submit_answers">Submit</button>
+        </form>
+    {% else %}
+        <!-- Topic Input Form -->
+        <form id="quizForm" method="POST">
+            {% csrf_token %}
+            <input type="text" name="topic" placeholder="Enter any topic (e.g. Planets, History)" required>
+            <button type="submit">🚀 Launch Quiz</button>
+        </form>
+    {% endif %}
+
+    {% if score is not None %}
+        <hr>
+        <h2>🎉 Your Score: {{ score }}/{{ total }}</h2>
+    {% endif %}
+</div>
+
+<footer>Made with 🧠 by Adharsh | Galaxy Edition 🌠</footer>
+
+<script>
+    // Show loader on quiz form submit
+    document.getElementById("quizForm")?.addEventListener("submit", function () {
+        document.getElementById("loadingScreen").style.display = "flex";
+    });
+
+    window.addEventListener("load", function () {
+        document.getElementById("loadingScreen").style.display = "none";
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        h1 {
+            color: #333;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .wrong {
+            color: red;
+            font-weight: bold;
+        }
+        .normal {
+            color: black;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        hr {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Score: {{ score }} / {{ total }}</h1>
+    <hr>
+
+    {% for q in quiz_data %}
+        <div>
+            <p><strong>Q{{ forloop.counter }}: {{ q.question }}</strong></p>
+            <ul>
+                {% with user_answer=user_answers|slice:":1"|first %}
+                    {% for key, value in q.options.items %}
+                        {% if key == q.answer and key == user_answers|slice:"%s:%s"|format:forloop.counter0|add:1 %}
+                            <li class="correct">{{ key }}) {{ value }} ✔️ (Your Answer)</li>
+                        {% elif key == q.answer %}
+                            <li class="correct">{{ key }}) {{ value }} ✔️</li>
+                        {% elif key == user_answers|slice:"%s:%s"|format:forloop.counter0|add:1 %}
+                            <li class="wrong">{{ key }}) {{ value }} ❌ (Your Answer)</li>
+                        {% else %}
+                            <li class="normal">{{ key }}) {{ value }}</li>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+            </ul>
+        </div>
+        <br>
+    {% endfor %}
+</body>
+</html>
